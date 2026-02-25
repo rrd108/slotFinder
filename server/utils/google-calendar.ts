@@ -1,3 +1,4 @@
+import NodeCache from 'node-cache'
 import { google } from 'googleapis'
 import { join } from 'node:path'
 
@@ -9,6 +10,8 @@ const SCOPES = [
 const keyFile = join(process.cwd(), 'webmania-383615-ef4510e17e0f.json')
 
 let calendarClient: any = null
+
+const busySlotsCache = new NodeCache({ stdTTL: 300 }) // 5 minutes cache
 
 async function getCalendarClient() {
   if (calendarClient) return calendarClient
@@ -38,6 +41,13 @@ export async function addCalendarToWatchlist(calendarId: string) {
 }
 
 export async function getBusySlots(calendarIds: string[], date: string) {
+  const cacheKey = `${calendarIds.sort().join(',')}_${date}`
+  
+  const cached = busySlotsCache.get(cacheKey)
+  if (cached) {
+    return cached as any[]
+  }
+
   const calendar = await getCalendarClient()
   
   const start = `${date}T00:00:00+01:00`
@@ -69,7 +79,11 @@ export async function getBusySlots(calendarIds: string[], date: string) {
     }
   }
 
-  return allBusy.sort((a, b) => a.start.localeCompare(b.start))
+  const sorted = allBusy.sort((a, b) => a.start.localeCompare(b.start))
+  
+  busySlotsCache.set(cacheKey, sorted)
+  
+  return sorted
 }
 
 export async function createCalendarEvent(
@@ -95,6 +109,9 @@ export async function createCalendarEvent(
       }
     }
   })
+
+  // Invalidate cache after creating event
+  busySlotsCache.flushAll()
 
   return res.data
 }
