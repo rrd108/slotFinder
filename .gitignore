@@ -1,4 +1,19 @@
+# Dependencies
 node_modules/
-*.json
+
+# Build
+.nuxt/
+.output/
+
+# Database
+data/
+
+# Service account (keep locally)
+webmania-*.json
+
+# Package files (keep)
 !package.json
 !package-lock.json
+
+# OS
+.DS_Store
