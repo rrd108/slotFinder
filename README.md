@@ -4,7 +4,7 @@ Magyar nyelvű alkalmazás csapatok közös időpont egyeztetésére Google Cale
 
 ## Funkciók
 
-- 🔐 Felhasználókezelés (bejelentkezés, regisztráció)
+- 🔐 Felhasználókezelés (bejelentkezés, regisztráció, Google fiókkal)
 - 📅 Google Calendar integráció (service account-on keresztül)
 - 👥 Más felhasználók foglalt időpontjainak megtekintése
 - ⭐ Szabad idősávok kiemelése
@@ -33,13 +33,15 @@ npm install
 2. API-k és szolgáltatások → Könyvtár → Google Calendar API → Engedélyezés
 3. Hitelesítő adatok → Szolgáltatásfiók létrehozása
 4. Kulcs létrehozása → JSON formátum
-5. Mentsd el a fájlt `webmania-XXX.json` néven
+5. Mentsd el a fájlt a projekt gyokerében (bármilyen névvel)
+6. Állítsd be a `nuxt.config.ts` fájlban a `googleCalendarServiceKey` és `googleCalendarServiceEmail` értékeket
 
 ### 4. Adatbázis létrehozása
 
 ```bash
+mkdir -p data
 npx nuxt-users migrate
-npx tsx server/database/schema.ts
+sqlite3 data/users.db < misc/database.sql
 ```
 
 ### 5. Admin felhasználó létrehozása
@@ -62,7 +64,7 @@ Minden felhasználónak meg kell osztania a naptárát a service account-tal:
 
 1. Google Calendar → Beállítások → Naptár kiválasztása
 2. Naptár megosztása specific személyekkel
-3. Add hozzá a service account email címét: `slotfinder@webmania-383615.iam.gserviceaccount.com`
+3. Add hozzá a service account email címét (a `nuxt.config.ts`-ban beállított értéket)
 4. jogosultság: **Csak az elfoglaltsági adatok megtekintése**
 
 ## Használat
@@ -73,7 +75,7 @@ Minden felhasználónak meg kell osztania a naptárát a service account-tal:
 4. A naptár mutatja a szabad és foglalt időpontokat
 5. Szabad idősávra kattintva meghívót küldhetsz
 
-## Termelés
+## Deployment
 
 ```bash
 npm run build
@@ -150,7 +152,8 @@ docker run -d -p 3000:3000 --name slotfinder slotfinder
 ### Fontos az önhosztoláshoz
 
 - Az `app.config.ts` vagy környezeti változókban állítsd be a `NUXT_PUBLIC_BASE_URL` címet
-- A `server/database/data` mappa az SQLite adatbázist tartalmazza - backup-oláshoz másold le
+- A `data` mappa az SQLite adatbázist tartalmazza - backup-oláshoz másold le
+- A `nuxt.config.ts`-ban állítsd be a Google Calendar service account beállításokat
 
 ## Licenc
 

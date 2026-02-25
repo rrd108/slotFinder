@@ -36,7 +36,7 @@
             <li>Válaszd ki a naptárat</li>
             <li>Másold ki a "Naptár azonosító" értéket</li>
             <li>
-              Oszd meg a naptárat a <code class="bg-white px-1">slotfinder@webmania-383615.iam.gserviceaccount.com</code> címmel. <em>
+              Oszd meg a naptárat a <code class="bg-white px-1">{{ config.googleCalendarServiceEmail }}</code> címmel. <em>
                 Csak az elfoglaltsági adatok
                 megtekintése jogosultságot kell választani
               </em>, így nem látjuk mit csinálsz, csak azt, hogy foglalt vagy.
@@ -91,6 +91,7 @@
 </template>
 
 <script setup lang="ts">
+  const config = useRuntimeConfig()
   const { user, isAuthenticated, fetchUser } = useAuthentication()
 
   await fetchUser(true)

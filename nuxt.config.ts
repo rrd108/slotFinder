@@ -9,6 +9,8 @@ export default defineNuxtConfig({
   ],
 
   runtimeConfig: {
+    googleCalendarServiceKey: 'webmania-383615-ef4510e17e0f.json',
+    googleCalendarServiceEmail: 'slotfinder@webmania-383615.iam.gserviceaccount.com',
     nuxtUsers: {
       connector: {
         name: 'sqlite',

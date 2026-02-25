@@ -1,43 +1,4 @@
-CREATE TABLE migrations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL UNIQUE,
-      executed_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-CREATE TABLE sqlite_sequence(name,seq);
-CREATE TABLE users (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL UNIQUE,
-      name TEXT NOT NULL,
-      password TEXT NOT NULL,
-      role TEXT NOT NULL DEFAULT 'user',
-      google_id TEXT UNIQUE,
-      profile_picture TEXT,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    , active BOOLEAN DEFAULT TRUE);
-CREATE TABLE personal_access_tokens (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      tokenable_type TEXT NOT NULL,
-      tokenable_id INTEGER NOT NULL,
-      name TEXT NOT NULL,
-      token TEXT NOT NULL UNIQUE,
-      abilities TEXT,
-      last_used_at DATETIME,
-      expires_at DATETIME,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-CREATE TABLE password_reset_tokens (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      email TEXT NOT NULL,
-      token TEXT NOT NULL UNIQUE,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-CREATE INDEX idx_password_reset_tokens_email ON password_reset_tokens (email);
-CREATE INDEX idx_password_reset_tokens_token ON password_reset_tokens (token);
-CREATE INDEX idx_users_active ON users (active);
-CREATE INDEX idx_personal_access_tokens_tokenable ON personal_access_tokens (tokenable_type, tokenable_id);
-CREATE TABLE user_calendars (
+CREATE TABLE IF NOT EXISTS user_calendars (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     calendar_id TEXT NOT NULL,
@@ -46,7 +7,8 @@ CREATE TABLE user_calendars (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
-CREATE TABLE user_availability (
+
+CREATE TABLE IF NOT EXISTS user_availability (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     day_of_week INTEGER,
@@ -57,7 +19,8 @@ CREATE TABLE user_availability (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
   );
-CREATE TABLE invitations (
+
+CREATE TABLE IF NOT EXISTS invitations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     organizer_id INTEGER NOT NULL,
     title TEXT,

@@ -7,7 +7,8 @@ const SCOPES = [
   'https://www.googleapis.com/auth/calendar.events'
 ]
 
-const keyFile = join(process.cwd(), 'webmania-383615-ef4510e17e0f.json')
+const config = useRuntimeConfig()
+const keyFile = join(process.cwd(), config.googleCalendarServiceKey)
 
 let calendarClient: any = null
 
