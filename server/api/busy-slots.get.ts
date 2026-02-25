@@ -16,17 +16,23 @@ export default defineEventHandler(async (event) => {
 
   const targetUserIds = userIds ? userIds.split(',').map(Number) : []
 
+  const currentUser = event.context.nuxtUsers?.user
   const userCalendarMap = new Map<number, string[]>()
 
   if (targetUserIds.length === 0) {
-    const user = event.context.nuxtUsers?.user
-    if (user?.id) {
+    if (currentUser?.id) {
       const calendars = db.prepare(`
         SELECT calendar_id FROM user_calendars WHERE user_id = ? AND is_active = 1
-      `).all(user.id) as { calendar_id: string }[]
-      userCalendarMap.set(user.id, calendars.map(c => c.calendar_id))
+      `).all(currentUser.id) as { calendar_id: string }[]
+      userCalendarMap.set(currentUser.id, calendars.map(c => c.calendar_id))
     }
   } else {
+    if (currentUser?.id) {
+      const calendars = db.prepare(`
+        SELECT calendar_id FROM user_calendars WHERE user_id = ? AND is_active = 1
+      `).all(currentUser.id) as { calendar_id: string }[]
+      userCalendarMap.set(currentUser.id, calendars.map(c => c.calendar_id))
+    }
     for (const userId of targetUserIds) {
       const calendars = db.prepare(`
         SELECT calendar_id FROM user_calendars WHERE user_id = ? AND is_active = 1

@@ -18,12 +18,6 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Calendar ID kötelező' })
   }
 
-  try {
-    await addCalendarToWatchlist(calendar_id)
-  } catch (e) {
-    console.error('Error adding calendar to watchlist:', e)
-  }
-
   const result = db.prepare(`
     INSERT INTO user_calendars (user_id, calendar_id, calendar_name)
     VALUES (?, ?, ?)
