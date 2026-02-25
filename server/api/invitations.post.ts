@@ -18,17 +18,12 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Hiányzó adatok' })
   }
 
-  const attendeeEmails = db.prepare(`
-    SELECT email FROM users WHERE id IN (${attendee_ids.join(',')})
-  `).all() as { email: string }[]
-
   let googleEventId = null
   try {
     const eventResult = await createCalendarEvent(calendar_id, {
       summary: title,
-      start: start_time,
-      end: end_time,
-      attendees: attendeeEmails.map(a => a.email)
+      start: start_time + '+01:00',
+      end: end_time + '+01:00'
     })
     googleEventId = eventResult.id
   } catch (e) {
