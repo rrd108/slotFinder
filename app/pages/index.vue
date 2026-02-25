@@ -268,11 +268,11 @@
               <div class="text-xs">{{ day.hunName }}</div>
               <div class="font-bold">{{ day.day }}</div>
             </div>
-            <div class="bg-white border rounded-b p-2 space-y-1">
+            <div class="bg-white rounded-b p-2 space-y-1">
               <div
                 v-for="hour in hours"
                 :key="hour"
-                class="h-8 text-xs flex items-center gap-1"
+                class="h-8 text-xs flex items-center gap-1 px-1"
                 :class="getSlotClass(day.date, hour)"
                 @click="handleSlotClick(day.date, hour)"
               >
