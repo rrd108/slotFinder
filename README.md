@@ -94,6 +94,64 @@ pm2 start .output/server/index.mjs --name slotfinder
 - **Adatbázis**: SQLite
 - **Google API**: googleapis
 
+## Önhosztolás
+
+Ez az alkalmazás bármilyen szerveren futtatható, amely támogatja a Node.js alkalmazásokat.
+
+### VPS (DigitalOcean, Hetzner, Linode, stb.)
+
+```bash
+# Szerver beállítása
+sudo apt update && sudo apt install -y nodejs npm git
+
+# Klónozás
+git clone https://github.com/rrd108/slotFinder.git
+cd slotFinder
+
+# Telepítés
+npm install
+npm run build
+
+# Futtatás PM2-vel
+pm2 start .output/server/index.mjs --name slotfinder
+pm2 startup  # követd az utasításokat a rendszerindításhoz
+pm2 save
+```
+
+### Docker
+
+```bash
+# Dockerfile létrehozása
+cat > Dockerfile << 'EOF'
+FROM node:20-alpine
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
+EXPOSE 3000
+CMD ["node", ".output/server/index.mjs"]
+EOF
+
+# Build és futtatás
+docker build -t slotfinder .
+docker run -d -p 3000:3000 --name slotfinder slotfinder
+```
+
+### Render / Railway / Fly.io
+
+1. Csatlakoztasd a GitHub repository-t
+2. Build command: `npm run build`
+3. Start command: `node .output/server/index.mjs`
+4. Add environment változókat (NUXT_ prefix nélkül a .env-ből)
+
+### Fontos az önhosztoláshoz
+
+- Az `app.config.ts` vagy környezeti változókban állítsd be a `NUXT_PUBLIC_BASE_URL` címet
+- A `server/database/data` mappa az SQLite adatbázist tartalmazza - backup-oláshoz másold le
+
 ## Licenc
 
 MIT
