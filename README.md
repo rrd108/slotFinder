@@ -12,6 +12,12 @@ Magyar nyelvű alkalmazás csapatok közös időpont egyeztetésére Google Cale
 - ⚙️ Egyedi nem elérhető időpontok beállítása (pl. vasárnap, ebédidő)
 - 💾 5 perces cache a gyorsabb működéshez
 
+## Képernyőképek
+
+![Bejelentkezés](public/screenshot.png)
+![Naptár](public/index.png)
+![Beállítások](public/settings.png)
+
 ## Telepítés
 
 ### 1. Klónozás
