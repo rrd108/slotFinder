@@ -34,22 +34,50 @@ Minimal Node.js script to read Google Calendar events using a service account.
 
 ```bash
 npm install
-node index.js
 ```
 
-## Usage
+On first run, the script will discover your calendars. Run with a date:
 
-The script automatically discovers all calendars shared with the service account.
+```bash
+node index.js 2026-02-25
+```
 
-To query a specific date, edit `targetDate` in `index.js`:
+Without a date, it shows today's events.
 
-```javascript
-const targetDate = '2026-02-28';
+## Adding New Calendars
+
+Google Service Accounts don't auto-discover newly shared calendars. To add one:
+
+1. Get the **Calendar ID** from Calendar Settings (bottom of the page)
+2. Edit `CALENDAR_CONTACTS` in `index.js`:
+   ```javascript
+   const CALENDAR_CONTACTS = {
+     'calendar-id@group.calendar.google.com': { name: 'John', email: 'john@example.com' },
+   };
+   ```
+3. The script will automatically include it on next run
+
+## Output
+
+The script shows busy slots with calendar owner info:
+
+```
+Calendars (3):
+  - rrd@1108.cc: Radharadhya Das (rrd@1108.cc)
+  - 1108.cc_g4hha1ln9lar7jib60hes5nf54@group.calendar.google.com: Csala (you@decide.com)
+  - rrd108@gmail.com: Radharadya dasa (rrd108@gmail.com)
+
+Busy slots on 2026-02-25:
+09:00 - 11:00 | Radharadhya Das | rrd@1108.cc
+12:00 - 13:00 | Radharadhya Das | rrd@1108.cc
+13:00 - 15:00 | Radharadya dasa | rrd108@gmail.com
 ```
 
 ## Troubleshooting
 
-If no calendars appear on first run, the script needs to add them to its watchlist. This requires broader permissions. Run once with:
+### No calendars appear
+
+If no calendars appear on first run, you need to add them manually. The script needs broader permissions once:
 
 ```javascript
 scopes: [
@@ -58,4 +86,4 @@ scopes: [
 ]
 ```
 
-After the first run, you can switch back to readonly scope.
+After the first run, switch back to readonly scope.
