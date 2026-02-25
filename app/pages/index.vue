@@ -36,7 +36,7 @@
   const weekLabel = computed(() => {
     const start = weekDays.value[0]
     const end = weekDays.value[6]
-    return `${start.day}. ${hungarianMonths[new Date(start.date).getMonth()]} - ${end.day}. ${hungarianMonths[new Date(end.date).getMonth()]}`
+    return `${hungarianMonths[new Date(start.date).getMonth()]} ${start.day} - ${hungarianMonths[new Date(end.date).getMonth()]} ${end.day}`
   })
 
   const hours = Array.from({ length: 14 }, (_, i) => i + 8)
@@ -172,21 +172,31 @@
       const startTime = `${selectedDate.value}T${selectedHour.value.toString().padStart(2, '0')}:00:00`
       const endTime = `${selectedDate.value}T${(selectedHour.value + 1).toString().padStart(2, '0')}:00:00`
 
-      await $fetch('/api/invitations', {
-        method: 'POST',
-        body: {
-          title: invitationTitle.value,
-          start_time: startTime,
-          end_time: endTime,
-          attendee_ids: selectedUsers.value,
-          calendar_id: 'primary',
-        },
+      const startFormatted = new Date(startTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+      const endFormatted = new Date(endTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+
+      const userEmails = selectedUsers.value.map(id => {
+        const u = users.value.find(user => user.id === id)
+        return u?.email
+      }).filter(Boolean).join(',')
+
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: invitationTitle.value,
+        dates: `${startFormatted}/${endFormatted}`
       })
 
+      if (userEmails) {
+        params.append('add', userEmails)
+      }
+
+      const googleCalendarUrl = `https://calendar.google.com/calendar/render?${params.toString()}`
+
+      window.open(googleCalendarUrl, '_blank')
+
       showInvitationModal.value = false
-      await loadBusySlots()
     } catch (e) {
-      console.error('Error sending invitation:', e)
+      console.error('Error opening Google Calendar:', e)
     } finally {
       sending.value = false
     }
@@ -299,7 +309,10 @@
       <template #content>
         <UCard>
           <template #header>
-            <h3 class="font-bold">Meghívó kiküldése a résztvevőknek?</h3>
+            <div class="flex items-center justify-between w-full">
+              <h3 class="font-bold">Meghívó kiküldése a résztvevőknek?</h3>
+              <UButton variant="ghost" icon="i-lucide-x" @click="showInvitationModal = false" />
+            </div>
           </template>
 
           <p class="text-sm text-gray-500 mb-4">
@@ -327,13 +340,13 @@
           </div>
 
           <UFormField label="Esemény neve" required>
-            <UInput v-model="invitationTitle" placeholder="pl. Megbeszélés" />
+            <UInput v-model="invitationTitle" placeholder="pl. Megbeszélés" class="w-full" />
           </UFormField>
 
           <template #footer>
             <div class="flex justify-end gap-2">
               <UButton variant="ghost" @click="showInvitationModal = false">Mégsem</UButton>
-              <UButton :loading="sending" @click="sendInvitation">Küldés</UButton>
+              <UButton :loading="sending" @click="sendInvitation">Esemény létrehozása a Google Calendarban</UButton>
             </div>
           </template>
         </UCard>
