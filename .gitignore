@@ -17,3 +17,5 @@ webmania-*.json
 
 # OS
 .DS_Store
+
+.env

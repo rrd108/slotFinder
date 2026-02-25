@@ -1,23 +1,33 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   devtools: { enabled: true },
-  
+
   modules: [
     '@nuxt/ui',
     '@nuxt/icon',
     'nuxt-users'
   ],
 
-  nuxtUsers: {
-    connector: { 
-      name: 'sqlite', 
-      options: { path: './data/users.db' } 
-    },
-    auth: { 
-      whitelist: ['/login', '/register'],
-      permissions: { 
-        user: ['*'], 
-        admin: ['*'] 
+  runtimeConfig: {
+    nuxtUsers: {
+      connector: {
+        name: 'sqlite',
+        options: { path: './data/users.db' }
+      },
+      auth: {
+        whitelist: ['/register'],
+        permissions: {
+          user: ['*'],
+          admin: ['*'],// TODO
+        },
+        google: {
+          successRedirect: '/',
+          allowAutoRegistration: true,
+          errorRedirect: '/login?error=oauth_failed',
+          scopes: ['openid', 'profile', 'email'],
+          clientId: process.env.NUXT_NUXT_USERS_GOOGLE_CLIENT_ID || '',
+          clientSecret: process.env.NUXT_NUXT_USERS_GOOGLE_CLIENT_SECRET || ''
+        }
       }
     }
   },

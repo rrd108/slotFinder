@@ -5,7 +5,14 @@
         <h1 class="text-xl font-bold text-center">Regisztráció</h1>
       </template>
 
-      <NUsersUserForm @success="handleSuccess" />
+      <NUsersGoogleLoginButton 
+        button-text="Regisztráció Google-lel"
+        class="mb-4 w-full"
+      />
+
+      <USeparator label="vagy" class="my-4" />
+
+      <NUsersRegisterForm @success="handleSuccess" />
 
       <p class="text-center text-sm text-gray-500 mt-4">
         Van már fiókod?

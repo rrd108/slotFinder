@@ -1,10 +1,8 @@
 <script setup lang="ts">
-  const { user, isAuthenticated, fetchUser } = useAuthentication()
+  const { user, isAuthenticated } = useAuthentication()
   const sidebarOpen = ref(false)
 
-  await fetchUser(true)
-
-  if (!isAuthenticated.value) {
+  if (!user.value) {
     navigateTo('/login')
   }
 
@@ -42,6 +40,7 @@
   const hours = Array.from({ length: 14 }, (_, i) => i + 8)
 
   const busySlots = ref<any[]>([])
+  const loadingBusySlots = ref(false)
 
   onMounted(async () => {
     await loadUsers()
@@ -57,6 +56,7 @@
   }
 
   async function loadBusySlots() {
+    loadingBusySlots.value = true
     const userIds = selectedUsers.value.length > 0 ? selectedUsers.value.join(',') : ''
 
     const dates = weekDays.value.map(d => d.date).join(',')
@@ -72,6 +72,8 @@
       busySlots.value = results
     } catch (e) {
       console.error('Error loading busy slots:', e)
+    } finally {
+      loadingBusySlots.value = false
     }
   }
 
@@ -172,18 +174,27 @@
       const startTime = `${selectedDate.value}T${selectedHour.value.toString().padStart(2, '0')}:00:00`
       const endTime = `${selectedDate.value}T${(selectedHour.value + 1).toString().padStart(2, '0')}:00:00`
 
-      const startFormatted = new Date(startTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
-      const endFormatted = new Date(endTime).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')
+      const startFormatted = new Date(startTime)
+        .toISOString()
+        .replace(/[-:]/g, '')
+        .replace(/\.\d{3}/, '')
+      const endFormatted = new Date(endTime)
+        .toISOString()
+        .replace(/[-:]/g, '')
+        .replace(/\.\d{3}/, '')
 
-      const userEmails = selectedUsers.value.map(id => {
-        const u = users.value.find(user => user.id === id)
-        return u?.email
-      }).filter(Boolean).join(',')
+      const userEmails = selectedUsers.value
+        .map(id => {
+          const u = users.value.find(user => user.id === id)
+          return u?.email
+        })
+        .filter(Boolean)
+        .join(',')
 
       const params = new URLSearchParams({
         action: 'TEMPLATE',
         text: invitationTitle.value,
-        dates: `${startFormatted}/${endFormatted}`
+        dates: `${startFormatted}/${endFormatted}`,
       })
 
       if (userEmails) {
@@ -272,6 +283,10 @@
           <UButton icon="i-lucide-calendar" @click="goToToday">Ma</UButton>
         </div>
 
+        <div class="relative">
+          <div v-if="loadingBusySlots" class="absolute inset-0 z-10 flex items-center justify-center bg-white/70 rounded-lg">
+            <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary animate-spin" />
+          </div>
         <div class="grid grid-cols-7 gap-2">
           <div v-for="day in weekDays" :key="day.date" class="min-w-[140px]">
             <div class="text-center p-2 rounded-t" :class="isToday(day.date) ? 'bg-primary text-white' : 'bg-gray-100'">
@@ -302,36 +317,34 @@
             </div>
           </div>
         </div>
+        </div>
       </main>
     </div>
 
     <UModal v-model:open="showInvitationModal">
       <template #content>
-        <UCard>
+        <UCard class="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
           <template #header>
             <div class="flex items-center justify-between w-full">
-              <h3 class="font-bold">Meghívó kiküldése a résztvevőknek?</h3>
+              <h3 class="font-bold text-gray-900 dark:text-white">Meghívó kiküldése a résztvevőknek?</h3>
               <UButton variant="ghost" icon="i-lucide-x" @click="showInvitationModal = false" />
             </div>
           </template>
 
-          <p class="text-sm text-gray-500 mb-4">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
             {{ formatDateTime(selectedDate, selectedHour) }}
           </p>
 
           <div v-if="selectedUsers.length > 0" class="mb-4">
-            <p class="text-sm font-medium mb-2">Kiválasztott résztvevők:</p>
+            <p class="text-sm font-medium mb-2 text-gray-900 dark:text-white">Kiválasztott résztvevők:</p>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="userId in selectedUsers"
                 :key="userId"
-                class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm"
+                class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm text-gray-900 dark:text-white"
                 :style="{ backgroundColor: getUserColor(userId) + '20', border: `1px solid ${getUserColor(userId)}` }"
               >
-                <span
-                  class="w-5 h-5 rounded-full flex items-center justify-center text-xs text-white"
-                  :style="{ backgroundColor: getUserColor(userId) }"
-                >
+                <span class="w-5 h-5 rounded-full flex items-center justify-center text-xs text-white" :style="{ backgroundColor: getUserColor(userId) }">
                   {{ (users.find(u => u.id === userId)?.email || '').slice(0, 1).toUpperCase() }}
                 </span>
                 {{ users.find(u => u.id === userId)?.name || users.find(u => u.id === userId)?.email }}
