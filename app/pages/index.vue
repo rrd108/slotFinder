@@ -206,6 +206,7 @@
 
   const userColors = [
     '#ef4444', // 0 - red (current user)
+    '#8b5cf6', // 14 - violet
     '#78716c', // 1 - stone
     '#22c55e', // 2 - green
     '#06b6d4', // 3 - cyan
@@ -219,7 +220,6 @@
     '#14b8a6', // 11 - teal
     '#06b6d4', // 12 - cyan
     '#3b82f6', // 13 - blue
-    '#8b5cf6', // 14 - violet
     '#f43f5e', // 15 - rose
     '#84cc16', // 16 - lime
     '#0ea5e9', // 17 - sky
@@ -232,20 +232,7 @@
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <UButton icon="i-lucide-menu" variant="ghost" class="lg:hidden" @click="sidebarOpen = !sidebarOpen" />
-        <h1 class="text-xl font-bold">slotFinder</h1>
-      </div>
-      <div class="flex items-center gap-2">
-        <NuxtLink to="/settings">
-          <UButton icon="i-lucide-settings" variant="ghost">Beállítások</UButton>
-        </NuxtLink>
-        <NUsersLogoutLink>
-          <UButton icon="i-lucide-log-out" variant="ghost">Kijelentkezés</UButton>
-        </NUsersLogoutLink>
-      </div>
-    </header>
+    <AppHeader v-model:sidebar-open="sidebarOpen" />
 
     <div class="flex">
       <aside class="w-64 bg-white border-r border-gray-200 p-4 flex-shrink-0" :class="{ 'hidden lg:block': !sidebarOpen }">
@@ -294,10 +281,12 @@
                   <span
                     v-for="(busy, idx) in getSlotBusyColors(day.date, hour)"
                     :key="idx"
-                    class="w-3 h-3 rounded-full border border-white"
+                    class="w-6 h-6 rounded-full border border-white flex items-center justify-center text-[10px] font-medium text-white shrink-0"
                     :style="{ backgroundColor: busy.color }"
                     :title="busy.email"
-                  />
+                  >
+                    {{ busy.email.slice(0, 1).toUpperCase() }}
+                  </span>
                 </div>
               </div>
             </div>
