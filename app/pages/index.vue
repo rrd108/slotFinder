@@ -207,11 +207,11 @@
   const userColors = [
     '#ef4444', // 0 - red (current user)
     '#8b5cf6', // 14 - violet
-    '#78716c', // 1 - stone
-    '#22c55e', // 2 - green
     '#06b6d4', // 3 - cyan
+    '#22c55e', // 2 - green
     '#ec4899', // 4 - pink
     '#64748b', // 5 - slate
+    '#78716c', // 1 - stone
     '#f97316', // 6 - orange
     '#a855f7', // 7 - purple
     '#eab308', // 8 - yellow
@@ -295,21 +295,36 @@
       </main>
     </div>
 
-    <UModal v-model="showInvitationModal">
+    <UModal v-model:open="showInvitationModal">
       <template #content>
         <UCard>
           <template #header>
-            <h3 class="font-bold">Meghívó küldése</h3>
+            <h3 class="font-bold">Meghívó kiküldése a résztvevőknek?</h3>
           </template>
-
-          <p class="mb-4">
-            Biztosan szeretnél meghívót küldeni
-            <strong>{{ selectedUsers.length }}</strong> felhasználónak?
-          </p>
 
           <p class="text-sm text-gray-500 mb-4">
             {{ formatDateTime(selectedDate, selectedHour) }}
           </p>
+
+          <div v-if="selectedUsers.length > 0" class="mb-4">
+            <p class="text-sm font-medium mb-2">Kiválasztott résztvevők:</p>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="userId in selectedUsers"
+                :key="userId"
+                class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-sm"
+                :style="{ backgroundColor: getUserColor(userId) + '20', border: `1px solid ${getUserColor(userId)}` }"
+              >
+                <span
+                  class="w-5 h-5 rounded-full flex items-center justify-center text-xs text-white"
+                  :style="{ backgroundColor: getUserColor(userId) }"
+                >
+                  {{ (users.find(u => u.id === userId)?.email || '').slice(0, 1).toUpperCase() }}
+                </span>
+                {{ users.find(u => u.id === userId)?.name || users.find(u => u.id === userId)?.email }}
+              </span>
+            </div>
+          </div>
 
           <UFormField label="Esemény neve" required>
             <UInput v-model="invitationTitle" placeholder="pl. Megbeszélés" />
