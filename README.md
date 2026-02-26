@@ -14,8 +14,7 @@ Magyar nyelvű alkalmazás csapatok közös időpont egyeztetésére Google Cale
 
 ## Képernyőképek
 
-![Bejelentkezés](public/screenshot.png)
-![Naptár](public/index.png)
+![Naptár](public/calendar.png)
 ![Beállítások](public/settings.png)
 
 ## Telepítés
